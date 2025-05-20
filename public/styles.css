@@ -1,0 +1,134 @@
+body {
+  background: #121212;
+  color: #eee;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+h1 {
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ff4757;
+}
+
+.traffic-box {
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+  padding: 20px;
+  width: 100%;
+  max-width: 900px;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.stats-box {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.stat-card {
+  background: #2c2c2c;
+  border-radius: 12px;
+  padding: 15px 20px;
+  flex: 1 1 180px;
+  max-width: 210px;
+  box-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+  transition: background 0.3s ease;
+  cursor: default;
+}
+
+.stat-card:hover {
+  background: #ff4757;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.8);
+}
+
+.stat-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+/* Icon colors */
+.total-request-icon { color: #ff3f3f; }
+.rps-icon { color: #f1c40f; }
+.ip-count-icon { color: #2ecc71; }
+.most-country-icon { color: #ecf0f1; }
+
+.stat-label {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  user-select: text;
+}
+
+/* Button Take Photo styling */
+.btn-photo {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: #ff4757;
+  border: none;
+  color: white;
+  font-size: 22px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-photo:hover {
+  background-color: #e03e4f;
+  box-shadow: 0 0 22px rgba(255, 71, 87, 1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .traffic-box {
+    height: 280px;
+  }
+  .stat-card {
+    flex: 1 1 140px;
+    max-width: 180px;
+    padding: 12px 16px;
+  }
+  .stat-icon {
+    font-size: 28px;
+  }
+  .stat-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .traffic-box {
+    height: auto;
+    padding-bottom: 90px; /* space for button */
+  }
+  .stat-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+  .stat-icon {
+    font-size: 24px;
+  }
+  .stat-value {
+    font-size: 18px;
+  }
+}

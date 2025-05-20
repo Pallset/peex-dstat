@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PeeX - Dstat</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    h1 {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    #traffic-container {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+      width: 900px;
+      height: 320px;
+      position: relative;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .stat-box {
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 1rem;
+      min-width: 120px;
+      text-align: center;
+      box-shadow: 0 0 4px rgba(255,255,255,0.1);
+    }
+
+    .stat-box h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #aaa;
+    }
+
+    .stat-box span {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 0.25rem;
+      color: #fff;
+    }
+
+    #btn-photo {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+    }
+
+    #btn-photo:hover {
+      background: #43a047;
+    }
+
+    @media (max-width: 768px) {
+      #traffic-container {
+        width: 90vw;
+        height: 280px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #traffic-container {
+        width: 90vw;
+        height: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>PeeX - Dstat Realtime</h1>
+  <h2>Hit Here : https://dstat.peexs.my.id/hit</h2>
+
+  <div id="traffic-container">
+    <canvas id="traffic-chart"></canvas>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h3>Total Request</h3>
+      <span id="total-request">0</span>
+    </div>
+    <div class="stat-box">
+      <h3>RPS</h3>
+      <span id="rps">0</span>
+    </div>
+    <div class="stat-box">
+      <h3>IP Count</h3>
+      <span id="ip-count">0</span>
+    </div>
+    <div class="stat-box">
+      <h3>Most Country</h3>
+      <span id="most-country">Unknown <span id="whois-country"></span></span>
+    </div>
+  </div>
+
+  <button id="btn-photo">📸 Take a Photo</button>
+
+  <!-- Chart.js & html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
