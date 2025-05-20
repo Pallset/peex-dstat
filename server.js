@@ -8,7 +8,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// Daftar IP yang diblacklist
 const BLACKLISTED_IPS = new Set([
+    // Tambahkan IP yang ingin Anda blokir di sini, contoh:
+    // '192.168.1.100',
+    // '203.0.113.45'
 ]);
 
 let totalRequests = 0;
@@ -17,7 +21,7 @@ let requestCounts = new Map();
 let blockedIPs = new Set();
 const ipLogsFile = 'ip_logs.json';
 
-const HIT_RATE_LIMIT = 20000;
+const HIT_RATE_LIMIT = 10;
 const STRICT_RATE_LIMIT = 5;
 const BLOCK_DURATION = 60 * 1000;
 const RESET_INTERVAL = 3 * 60 * 1000;
@@ -57,6 +61,7 @@ async function getWhoisByIP(ip) {
 }
 let whoisCache = new Map();
 
+// Middleware untuk memeriksa blacklist
 const blacklistCheck = (req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || ''.split(',')[0].trim();
     if (BLACKLISTED_IPS.has(ip)) {
@@ -101,6 +106,7 @@ const hitDDoSProtect = (req, res, next) => {
     next();
 };
 
+// Middleware untuk memblokir akses langsung ke file sensitif dan otomatis blacklist IP
 const blockSensitiveFiles = (req, res, next) => {
     if (req.path === '/server.js' || req.path === '/style.css' || req.path === '/script.js') {
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || ''.split(',')[0].trim();
@@ -181,9 +187,11 @@ app.get('/api/takephoto', (req, res) => {
         });
 });
 
+// Terapkan middleware blacklist dan pemblokiran file sensitif
 app.use(blacklistCheck);
 app.use(blockSensitiveFiles);
 
+// Export handler untuk Vercel (jika Anda ingin deploy ke Vercel)
 export default async function handler(req, res) {
     await app(req, res);
 }
