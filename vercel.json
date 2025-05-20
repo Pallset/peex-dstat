@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/", "dest": "/api/" },       // Arahkan root ke handler API (untuk serve index.html)
+    { "src": "/stats", "dest": "/api/stats" },
+    { "src": "/hit", "dest": "/api/hit" },
+    { "src": "/api/takephoto", "dest": "/api/takephoto" },
+    { "src": "/(.*)", "dest": "/public/$1" }  // Serve file statis dari direktori public
+  ]
+}
