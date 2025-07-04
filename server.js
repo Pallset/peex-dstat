@@ -2,24 +2,24 @@ import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Daftar IP yang diblacklist
-const BLACKLISTED_IPS = new Set([
-    // Tambahkan IP yang ingin Anda blokir di sini
-]);
-
+const BLACKLISTED_IPS = new Set();
 let totalRequests = 0;
 let ipMap = new Map();
 let requestCounts = new Map();
 let blockedIPs = new Set();
 const ipLogsFile = 'ip_logs.json';
-
-const HIT_RATE_LIMIT = 10;
+const HIT_RATE_LIMIT = 20000;
 const STRICT_RATE_LIMIT = 5;
 const BLOCK_DURATION = 60 * 1000;
 const RESET_INTERVAL = 3 * 60 * 1000;
@@ -43,6 +43,7 @@ async function writeIPLogs(logs) {
 
 let ipLogs = await readIPLogs() || [];
 
+let whoisCache = new Map();
 async function getWhoisByIP(ip) {
     if (whoisCache.has(ip)) return whoisCache.get(ip);
     try {
@@ -57,10 +58,9 @@ async function getWhoisByIP(ip) {
         return 'Unknown';
     }
 }
-let whoisCache = new Map();
 
 const blacklistCheck = (req, res, next) => {
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || ''.split(',')[0].trim();
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
     if (BLACKLISTED_IPS.has(ip)) {
         console.warn(`Akses diblokir untuk IP ${ip} ke ${req.originalUrl}`);
         return res.status(403).send('Akses ditolak.');
@@ -93,19 +93,17 @@ const strictDDoSProtect = (req, res, next) => {
 
 const hitDDoSProtect = (req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
-
     ipMap.set(ip, (ipMap.get(ip) || 0) + 1);
     if (ipMap.get(ip) > HIT_RATE_LIMIT) {
         console.warn(`Rate limit terlampaui untuk /hit dari IP ${ip}.`);
         return res.status(429).send('Terlalu banyak permintaan.');
     }
-
     next();
 };
 
 const blockSensitiveFiles = (req, res, next) => {
-    if (req.path === '/server.js' || req.path === '/style.css' || req.path === '/script.js') {
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || ''.split(',')[0].trim();
+    if (['/server.js', '/style.css', '/script.js'].includes(req.path)) {
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
         console.warn(`Akses langsung diblokir dan IP diblacklist: ${req.path} dari IP ${ip}`);
         BLACKLISTED_IPS.add(ip);
         return res.status(404).send('Not Found');
@@ -113,18 +111,21 @@ const blockSensitiveFiles = (req, res, next) => {
     next();
 };
 
+// Hit endpoint
 app.get('/hit', hitDDoSProtect, (req, res) => {
     totalRequests++;
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || ''.split(',')[0].trim();
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
     ipLogs.push({ ip, timestamp: new Date().toISOString() });
     writeIPLogs(ipLogs).catch(console.error);
     res.json({ url: 't.me/sharingscript', message: 'PeeX - Dstat | dstat.peexs.my.id' });
 });
 
+// Homepage
 app.get('/', blacklistCheck, strictDDoSProtect, (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Stats
 app.get('/stats', blacklistCheck, strictDDoSProtect, async (req, res) => {
     let mostRequestIP = '';
     let maxRequestCount = 0;
@@ -163,6 +164,7 @@ app.get('/stats', blacklistCheck, strictDDoSProtect, async (req, res) => {
     });
 });
 
+// Proxy image
 app.get('/api/takephoto', (req, res) => {
     const imageUrl = req.query.url;
     if (!imageUrl) {
@@ -183,9 +185,12 @@ app.get('/api/takephoto', (req, res) => {
         });
 });
 
+// Middleware
 app.use(blacklistCheck);
 app.use(blockSensitiveFiles);
 
-export default async function handler(req, res) {
-    await app(req, res);
-}
+// Jalankan server di VPS
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server jalan di http://localhost:${PORT}`);
+});
