@@ -1,12 +1,8 @@
-import express from 'express';
-import cors from 'cors';
-import fetch from 'node-fetch';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch');
+const fs = require('fs').promises;
+const path = require('path');
 
 const app = express();
 app.use(cors());
